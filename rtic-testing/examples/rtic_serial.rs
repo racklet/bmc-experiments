@@ -2,8 +2,12 @@
 #![no_main]
 #![no_std]
 
+use atsamd_hal::common::usb::usb_device::device::{UsbDevice, UsbDeviceBuilder, UsbVidPid};
+use atsamd_hal::common::usb::usb_device::UsbError;
+use atsamd_hal::common::usb::UsbBus;
 use atsamd_hal::target_device::Interrupt;
 use itsybitsy_m4::timer::TimerCounter3;
+use itsybitsy_m4::usb::usb_device::bus::UsbBusAllocator;
 use itsybitsy_m4::{
     clock::GenericClockController,
     dotstar_bitbang,
@@ -15,11 +19,7 @@ use itsybitsy_m4::{
 };
 use panic_halt as _;
 use smart_leds::{SmartLedsWrite, RGB8};
-use usbd_serial::{SerialPort, USB_CLASS_CDC, DefaultBufferStore};
-use atsamd_hal::common::usb::usb_device::device::{UsbDeviceBuilder, UsbVidPid, UsbDevice};
-use atsamd_hal::common::usb::UsbBus;
-use itsybitsy_m4::usb::usb_device::bus::UsbBusAllocator;
-use atsamd_hal::common::usb::usb_device::UsbError;
+use usbd_serial::{DefaultBufferStore, SerialPort, USB_CLASS_CDC};
 // use itsybitsy_m4::pac::Interrupt;
 
 // I don't see a way to avoid writing this out since the Resources struct in an rtic app cannot
@@ -105,7 +105,7 @@ const APP: () = {
             peripherals.USB,
             &mut clocks,
             &mut peripherals.MCLK,
-            &mut pins.port
+            &mut pins.port,
         ));
 
         // TODO: Allocating two SerialPorts technically compiles and runs, but Linux
@@ -150,17 +150,29 @@ const APP: () = {
 
     #[task(binds = USB_OTHER, resources = [usb_device, usb_serial, usb_serial2])]
     fn usb_other(cx: usb_other::Context) {
-        usb_poll(cx.resources.usb_device, cx.resources.usb_serial, cx.resources.usb_serial2);
+        usb_poll(
+            cx.resources.usb_device,
+            cx.resources.usb_serial,
+            cx.resources.usb_serial2,
+        );
     }
 
     #[task(binds = USB_TRCPT0, resources = [usb_device, usb_serial, usb_serial2])]
     fn usb_trcpt0(cx: usb_trcpt0::Context) {
-        usb_poll(cx.resources.usb_device, cx.resources.usb_serial, cx.resources.usb_serial2);
+        usb_poll(
+            cx.resources.usb_device,
+            cx.resources.usb_serial,
+            cx.resources.usb_serial2,
+        );
     }
 
     #[task(binds = USB_TRCPT1, resources = [usb_device, usb_serial, usb_serial2])]
     fn usb_trcpt1(cx: usb_trcpt1::Context) {
-        usb_poll(cx.resources.usb_device,cx.resources.usb_serial, cx.resources.usb_serial2);
+        usb_poll(
+            cx.resources.usb_device,
+            cx.resources.usb_serial,
+            cx.resources.usb_serial2,
+        );
     }
 
     #[task(binds = TC2, resources = [timer, led, usb_serial])]
