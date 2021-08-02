@@ -1,0 +1,26 @@
+[package]
+name = "rtic-testing"
+version = "0.1.0"
+authors = ["Dennis Marttinen <twelho@welho.tech>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+itsybitsy_m4 = "0.5.0"
+atsamd-hal = "0.12.0"
+cortex-m = "0.7.3"
+cortex-m-rt = "0.6.14"
+cortex-m-rtic = "0.5.7"
+panic-halt = "0.2.0"
+smart-leds = "0.3.0"
+usb-device = "0.2.8"
+usbd-serial = "0.1.1"
+usbd_mass_storage = "0.1.0"
+usbd_scsi = "0.1.0"
+itm_logger = "0.1.2"
+apa102-spi = "0.3.2"
+bitbang-hal = "0.3.2"
+
+[features]
+default = ["itsybitsy_m4/usb", "atsamd-hal/usb", "atsamd-hal/samd51g", "atsamd-hal/samd51", "atsamd-hal/unproven"]
