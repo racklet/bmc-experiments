@@ -1,6 +1,6 @@
-# base-repo-layout
+# bmc-experiments
 
-Template (base) repository file layout for Racklet projects.
+This repository hosts experimental Rust firmware code for the BMC (and related) microcontrollers.
 
 ## Contributing
 
