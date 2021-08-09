@@ -108,17 +108,32 @@ const APP: () = {
             &mut pins.port,
         ));
 
+        /*
+        Bluepill Serial Monster comparison notes:
+        - 16 bit words (bMaxPacketSize0 and serial port wMaxPacketSize) vs. our 8
+        - uses composite_with_iads()
+        - A CDC-ACM serial port is a pair of two interfaces: Communications and CDC Data
+        - The serial monster simply exposes three pairs (6 interfaces)
+         */
+
         // TODO: Allocating two SerialPorts technically compiles and runs, but Linux
-        //  isn't happy about some device descriptors and refuses to work with it
+        //  isn't happy about some device descriptors and refuses to work with it:
+        /*
+            usb 3-4: new full-speed USB device number 41 using xhci_hcd
+            usb 3-4: unable to read config index 0 descriptor/start: -32
+            usb 3-4: chopping to 0 config(s)
+            usb 3-4: can't read configurations, error -32
+            usb usb3-port4: unable to enumerate USB device
+         */
+
         let usb_allocator = USB_ALLOCATOR.as_ref().unwrap();
         let mut usb_serial = SerialPort::new(usb_allocator);
         let mut usb_serial2 = SerialPort::new(usb_allocator);
 
         let mut usb_device = UsbDeviceBuilder::new(usb_allocator, UsbVidPid(0x16c0, 0x27dd))
-            .manufacturer("Fake Company")
-            .product("Suspicious Serial Port")
-            .serial_number("TEST")
-            .device_class(USB_CLASS_CDC)
+            .manufacturer("Racklet")
+            .product("Rust ATSAMD Serial Hub")
+            .serial_number("0000")
             .composite_with_iads()
             .build();
 
@@ -175,7 +190,7 @@ const APP: () = {
         );
     }
 
-    #[task(binds = TC2, resources = [timer, led, usb_serial])]
+    #[task(binds = TC2, resources = [timer, led, usb_serial, usb_serial2])]
     fn tc2(c: tc2::Context) {
         static mut EVEN: bool = true;
 
@@ -183,7 +198,8 @@ const APP: () = {
             return;
         }
 
-        c.resources.usb_serial.write(b"test\r\n").ok();
+        c.resources.usb_serial.write(b"Hello, World!\r\n").ok();
+        c.resources.usb_serial2.write(b"Another world!\r\n").ok();
         // write!(c.resources.usb_serial, "test");
 
         // let color = [if *EVEN {
@@ -210,26 +226,17 @@ fn usb_poll<B: usb_device::bus::UsbBus>(
     serial: &mut SerialPort<'static, B>,
     serial2: &mut SerialPort<'static, B>,
 ) {
-    let serial_data = usb_dev.poll(&mut [serial]);
-    let serial2_data = usb_dev.poll(&mut [serial2]);
 
-    // if !usb_dev.poll(&mut [serial]) {
-    //     return;
-    // }
-    if serial_data {
-        let mut buf = [0; 10];
+    if usb_dev.poll(&mut [serial, serial2]) {
+        let mut buf = [0; 10]; // Throwaway buffer
         match serial.read(&mut buf) {
             Ok(_) => {}
-            Err(UsbError::WouldBlock) => {}
+            Err(UsbError::WouldBlock) => {} // No bytes available for reading
             e => panic!("USB read error: {:?}", e),
         }
-    }
-
-    if serial2_data {
-        let mut buf = [0; 10];
         match serial2.read(&mut buf) {
             Ok(_) => {}
-            Err(UsbError::WouldBlock) => {}
+            Err(UsbError::WouldBlock) => {} // No bytes available for reading
             e => panic!("USB read error: {:?}", e),
         }
     }
