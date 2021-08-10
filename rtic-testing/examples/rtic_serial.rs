@@ -2,12 +2,9 @@
 #![no_main]
 #![no_std]
 
-use atsamd_hal::common::usb::usb_device::device::{UsbDevice, UsbDeviceBuilder, UsbVidPid};
-use atsamd_hal::common::usb::usb_device::UsbError;
-use atsamd_hal::common::usb::UsbBus;
-use atsamd_hal::target_device::Interrupt;
+use itsybitsy_m4::pac::Interrupt;
 use itsybitsy_m4::timer::TimerCounter3;
-use itsybitsy_m4::usb::usb_device::bus::UsbBusAllocator;
+use itsybitsy_m4::usb::UsbBus;
 use itsybitsy_m4::{
     clock::GenericClockController,
     dotstar_bitbang,
@@ -19,6 +16,9 @@ use itsybitsy_m4::{
 };
 use panic_halt as _;
 use smart_leds::{SmartLedsWrite, RGB8};
+use usb_device::bus::UsbBusAllocator;
+use usb_device::device::{UsbDevice, UsbDeviceBuilder, UsbVidPid};
+use usb_device::UsbError;
 use usbd_serial::{DefaultBufferStore, SerialPort, USB_CLASS_CDC};
 // use itsybitsy_m4::pac::Interrupt;
 
@@ -119,12 +119,12 @@ const APP: () = {
         // TODO: Allocating two SerialPorts technically compiles and runs, but Linux
         //  isn't happy about some device descriptors and refuses to work with it:
         /*
-            usb 3-4: new full-speed USB device number 41 using xhci_hcd
-            usb 3-4: unable to read config index 0 descriptor/start: -32
-            usb 3-4: chopping to 0 config(s)
-            usb 3-4: can't read configurations, error -32
-            usb usb3-port4: unable to enumerate USB device
-         */
+           usb 3-4: new full-speed USB device number 41 using xhci_hcd
+           usb 3-4: unable to read config index 0 descriptor/start: -32
+           usb 3-4: chopping to 0 config(s)
+           usb 3-4: can't read configurations, error -32
+           usb usb3-port4: unable to enumerate USB device
+        */
 
         let usb_allocator = USB_ALLOCATOR.as_ref().unwrap();
         let mut usb_serial = SerialPort::new(usb_allocator);
@@ -226,7 +226,6 @@ fn usb_poll<B: usb_device::bus::UsbBus>(
     serial: &mut SerialPort<'static, B>,
     serial2: &mut SerialPort<'static, B>,
 ) {
-
     if usb_dev.poll(&mut [serial, serial2]) {
         let mut buf = [0; 10]; // Throwaway buffer
         match serial.read(&mut buf) {
