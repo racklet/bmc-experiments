@@ -1,0 +1,9 @@
+[default.general]
+chip = "atsamd51g19a"
+
+[debug.rtt]
+enabled = true
+
+[debug.gdb]
+enabled = true
+gdb_connection_string = "localhost:3333"
