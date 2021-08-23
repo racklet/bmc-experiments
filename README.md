@@ -76,12 +76,12 @@ technically work with `probe-rs`, the firmware is proprietary and has issues
 talking to anything other than STM32 ARM chips. Our recommendation is flashing
 the probe with the [dap42] CMSIS-DAP firmware, which enable the probe to support
 basically any ARM chip (including STM32) and to work seamlessly with `probe-rs`
-(well once [#767] has been merged anyways, use [my `probe-rs` fork] in the
-meantime). Follow the [dap42 flashing instructions] to get going, soldering
-wires is most likely necessary for the initial flash, but updates can be
-delivered solely via USB when flashing the combined `dapboot` image. Some guides
-online may suggest soldering the SWO pin for tracing support, but this is not
-necessary when using the [Real-Time Transfer (RTT)] I/O protocol.
+(well once [#767] has made its way into a release anyways, use [my `probe-rs`
+fork] in the meantime). Follow the [dap42 flashing instructions] to get going,
+soldering wires is most likely necessary for the initial flash, but updates can
+be delivered solely via USB when flashing the combined `dapboot` image. Some
+guides online may suggest soldering the SWO pin for tracing support, but this is
+not necessary when using the [Real-Time Transfer (RTT)] I/O protocol.
 
 [clones]: https://wiki.cuvoodoo.info/doku.php?id=jtag
 
