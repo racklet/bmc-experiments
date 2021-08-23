@@ -79,7 +79,9 @@ basically any ARM chip (including STM32) and to work seamlessly with `probe-rs`
 (well once [#767] has been merged anyways, use [my `probe-rs` fork] in the
 meantime). Follow the [dap42 flashing instructions] to get going, soldering
 wires is most likely necessary for the initial flash, but updates can be
-delivered solely via USB when flashing the combined `dapboot` image.
+delivered solely via USB when flashing the combined `dapboot` image. Some guides
+online may suggest soldering the SWO pin for tracing support, but this is not
+necessary when using the [Real-Time Transfer (RTT)] I/O protocol.
 
 [clones]: https://wiki.cuvoodoo.info/doku.php?id=jtag
 
