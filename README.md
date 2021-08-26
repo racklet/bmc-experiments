@@ -55,8 +55,28 @@ to the host computer** (the machine where you're uploading code and debugging
 from). At present (August 23rd, 2021) the `probe-rs` [supported probe protocols]
 include CMSIS-DAP, ST-LINK, J-Link and experimentally FTDI (JTAG only). Feel
 free to look into each to understand their differences and use what works for
-you, but detailed below is the low cost and quite versatile setup that Racklet
-core developers have confirmed to be working.
+you. Detailed below is a simplified table highlighting some key differences
+between them as a starting point.
+
+| Protocol    | Firmware License                      | Supported Probes                | Supported MCUs          |
+|-------------|---------------------------------------|---------------------------------|-------------------------|
+| [CMSIS-DAP] | Open Source (implementation specific) | MCU based (e.g. ST-LINK series) | Everything*             |
+| ST-LINK     | Proprietary (STMicroelectronics)      | ST-LINK series (and clones)     | STM32 (and some others) |
+| J-Link      | Proprietary (SEGGER)                  | J-Link debug probes             | Everything              |
+| FTDI        | Hardware converter, no firmware       | FTDI USB converters             | Everything              |
+
+> \* Technically CMSIS-DAP requires the target MCU to have a [CoreSight Debug
+> Access Port (DAP)]. This is true for all ARM Cortex based CPU designs, but
+> e.g. AVR and RISC-V based MCUs are not supported (unless there are some hacks
+> involved).
+
+Due to its Open Source firmware support, versatility and low cost availability,
+the Racklet core team has settled on using [CMSIS-DAP] as the host communication
+protocol of choice. It is not overly difficult to convert an ST-LINK debug probe
+to run a CMSIS-DAP compatible firmware, and presents an affordable way to debug
+the ItsyBitsy M4 running an Atmel (now owned by Microchip) ARM processor, which
+has difficulties communicating with the stock ST-LINK firmware. Details are
+elaborated below.
 
 [debug probe]: https://developer.arm.com/tools-and-software/embedded/debug-probes
 
@@ -65,6 +85,10 @@ core developers have confirmed to be working.
 [SWD]: https://developer.arm.com/architectures/cpu-architecture/debug-visibility-and-trace/coresight-architecture/serial-wire-debug
 
 [supported probe protocols]: https://github.com/probe-rs/probe-rs/tree/master/probe-rs/src/probe
+
+[CMSIS-DAP]: https://arm-software.github.io/CMSIS_5/DAP/html/index.html
+
+[CoreSight Debug Access Port (DAP)]: https://developer.arm.com/documentation/102585/0000/what-is-a-debug-access-port
 
 ### ST-LINK V2 clone as a CMSIS-DAP adapter
 
