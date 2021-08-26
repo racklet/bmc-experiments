@@ -16,12 +16,7 @@ use smart_leds::RGB8;
 
 #[entry]
 fn main() -> ! {
-    rtt_init_print!();
-    // hprintln!("Hello, semihosting!").unwrap();
-
-    // exit QEMU
-    // NOTE do not run this on hardware; it can corrupt OpenOCD state
-    // debug::exit(debug::EXIT_SUCCESS);
+    rtt_init_print!(); // Initialize RTT I/O for printing and backtraces
 
     let mut cmp = CMP::take().unwrap();
     let mut peripherals = Peripherals::take().unwrap();
@@ -44,7 +39,7 @@ fn main() -> ! {
 
     let mut rgb = dotstar_bitbang(dotstar, &mut pins.port, SpinTimer::new(12));
     let off: [RGB8; 1] = [RGB8 { r: 0, g: 0, b: 0 }];
-    let on: [RGB8; 1] = [RGB8 { r: 1, g: 1, b: 1 }];
+    let on: [RGB8; 1] = [RGB8 { r: 1, g: 1, b: 1 }]; // Goes up to 255, but honestly this is bright enough
 
     let a: Option<u8> = None;
 
