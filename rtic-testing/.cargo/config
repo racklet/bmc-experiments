@@ -1,6 +1,11 @@
-# vim:ft=toml:
-[target.thumbv7em-none-eabihf]
-runner = 'arm-none-eabi-gdb'
+# Run all bare metal targets using probe-run
+[target.'cfg(all(target_os = "none"))']
+runner = "probe-run --chip atsamd51g19a"
+
+# Enable line table debug info for release builds for probe-run, the
+# generated symbols reside on the host and will not bloat the target binary
+[profile.release]
+debug = 1
 
 [build]
 target = "thumbv7em-none-eabihf"
